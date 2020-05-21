@@ -1,7 +1,7 @@
 from typing import List
 from os import path
 
-from kcu import sh, paths
+from kcu import sh, kpath
 
 from . import ffprobe
 
