@@ -1,7 +1,7 @@
 from typing import List
 from os import path
 
-from kov_utils import sh, paths
+from kcu import sh, paths
 
 from . import ffprobe
 
@@ -39,23 +39,26 @@ def add_silence_to_video(input: str, output: str) -> bool:
 
     return path.exists(output)
 
-def add_audio_to_video(input_a: str, input_v: str, output: str) -> bool:
-    sh.sh(
-        'ffmpeg -y -i ' + sh.path(input_v)+ ' -i ' + sh.path(input_a) + ' -c:v copy -map 0:v:0 -map 1:a:0 -shortest ' + sh.path(output)
-    )
+def add_audio_to_video(input_a: str, input_v: str, output: str, reencode: bool = False) -> bool:
+    cmd = 'ffmpeg -y -i ' + sh.path(input_v)+ ' -i ' + sh.path(input_a)
+
+    if not reencode:
+        cmd += ' -c:v copy -map 0:v:0 -map 1:a:0'
+    
+    cmd += ' -shortest ' + sh.path(output)
+
+    sh.sh(cmd)
 
     return path.exists(output)
 
-def loop_audio_to_video(in_a: str, in_v: str, out: str) -> bool:
-    return __loop_together(in_a, in_v, out)
+def loop_audio_to_video(in_a: str, in_v: str, out: str, reencode: bool = False) -> bool:
+    return __loop_together(in_v, in_a, out, reencode=reencode)
 
-def loop_video_to_audio(in_a: str, in_v: str, out: str) -> bool:
-    return __loop_together(in_v, in_a, out)
+def loop_video_to_audio(in_a: str, in_v: str, out: str, reencode: bool = False) -> bool:
+    return __loop_together(in_a, in_v, out, reencode=reencode)
 
 def loop(in_path: str, out_path: str, length_seconds: float):
-    sh.sh(
-        'ffmpeg -y -stream_loop -1 -i ' + sh.path(in_path) + ' -t ' + str(length_seconds) + ' ' + sh.path(out_path)
-    )
+    sh.sh('ffmpeg -y -stream_loop -1 -i ' + sh.path(in_path) + ' -t ' + str(length_seconds) + ' ' + sh.path(out_path))
 
     return path.exists(out_path)
 
@@ -89,7 +92,7 @@ def concat_videos(in_paths: List[str], out_path: str) -> bool:
 
         return True
 
-    temp_txt_path = path.join(paths.folder_path_of_file(out_path), '.__temp_list.txt')
+    temp_txt_path = path.join(kpath.folder_path_of_file(out_path), '.__temp_list.txt')
     temp_txt_content = ''
 
     for in_path in in_paths:
@@ -102,26 +105,26 @@ def concat_videos(in_paths: List[str], out_path: str) -> bool:
         f.write(temp_txt_content)
     
     sh.sh('ffmpeg -y -f concat -safe 0 -i ' + sh.path(temp_txt_path) + ' -c copy ' + sh.path(out_path))
-    paths.remove(temp_txt_path)
+    kpath.remove(temp_txt_path)
     
     return path.exists(out_path)
 
 # Private
 
 # both in_reference_path and in_follower_path can be audio or video
-# 1 needs to be video, thee otheer needs to be audio
-def __loop_together(in_reference_path: str, in_follower_path: str, out: str) -> bool:
+# 1 needs to be video, the otheer needs to be audio
+def __loop_together(in_reference_path: str, in_follower_path: str, out: str, reencode: bool = False) -> bool:
     reference_dur = ffprobe.get_duration(in_reference_path)
     follower_dur = ffprobe.get_duration(in_follower_path)
-    
-    looped_follower_path = paths.temp_path_for_path(in_follower_path)
+
+    looped_follower_path = kpath.temp_path_for_path(in_follower_path)
 
     if reference_dur > follower_dur:
         if not loop(in_follower_path, looped_follower_path, reference_dur):
             return False
     else:
         looped_follower_path = None
-    
+
     in_video_path = in_reference_path
     in_audio_path = looped_follower_path or in_follower_path
 
@@ -129,4 +132,4 @@ def __loop_together(in_reference_path: str, in_follower_path: str, out: str) -> 
         in_video_path = in_audio_path
         in_audio_path = in_reference_path
 
-    return add_audio_to_video(in_audio_path, in_video_path, out)
+    return add_audio_to_video(in_audio_path, in_video_path, out, reencode=reencode)
