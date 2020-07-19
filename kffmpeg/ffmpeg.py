@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from os import path
 
 from kcu import sh, kpath
@@ -19,11 +19,59 @@ def create_video_from_images(
     file_base_name: str = 'image',
     file_extension: str = '.jpg'
 ) -> bool:
+    start_number = 0
+
+    while True:
+        first_image_path = path.join(input_folder, file_base_name + '{:03d}'.format(start_number) + file_extension)
+
+        if path.exists(first_image_path):
+            break
+
+        start_number += 1
+
     sh.sh(
-        'ffmpeg -y -framerate ' + str(1.0/seconds_per_image) + ' -start_number 001 -i ' + path.join(input_folder, file_base_name + '%03d' + file_extension) + ' -pix_fmt yuv420p ' + output_file_path
+        'ffmpeg -y -framerate ' + str(1.0/seconds_per_image) + ' -start_number ' + '{:03d}'.format(start_number) + ' -i ' + path.join(input_folder, file_base_name + '%03d' + file_extension) + ' -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" ' + output_file_path,
+        debug=True
     )
 
     return path.exists(output_file_path)
+
+def create_video_from_image_paths(
+    image_paths: List[str],
+    output_file_path: str,
+    seconds_per_image: float = 3.0,
+    temp_folder_path: Optional[str] = None
+) -> bool:
+    temp_folder_path = temp_folder_path or path.join(kpath.folder_path_of_file(), '.__ffmpeg_images_temp')
+    import os
+    os.makedirs(temp_folder_path, exist_ok=True)
+
+    file_base_name = 'image'
+    i = 1
+    file_extension = kpath.extension(image_paths[0], include_dot=True)
+
+    for image_path in image_paths:
+        new_image_path = path.join(temp_folder_path, file_base_name + '{:03d}'.format(i) + file_extension)
+        sh.cp(image_path, new_image_path)
+        i += 1
+
+    res = create_video_from_images(temp_folder_path, output_file_path, seconds_per_image=seconds_per_image, file_base_name=file_base_name, file_extension=file_extension)
+    kpath.remove(temp_folder_path)
+
+    return res
+
+def create_video_from_image(
+    image_path: str,
+    output_file_path: str,
+    duration: float = 3.0,
+    temp_folder_path: Optional[str] = None
+) -> bool:
+    return create_video_from_image_paths(
+        [image_path],
+        output_file_path,
+        seconds_per_image=duration,
+        temp_folder_path=temp_folder_path
+    )
 
 def remove_audio(input: str, output: str) -> bool:
     sh.sh(
