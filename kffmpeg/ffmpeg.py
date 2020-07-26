@@ -70,14 +70,11 @@ def create_video_from_image(
     image_path: str,
     output_file_path: str,
     duration: float = 3.0,
-    temp_folder_path: Optional[str] = None,
+    fps: float = 30.0,
     debug: bool = False
 ) -> bool:
-    return create_video_from_image_paths(
-        [image_path],
-        output_file_path,
-        seconds_per_image=duration,
-        temp_folder_path=temp_folder_path,
+    sh.sh(
+        'ffmpeg -y -loop 1 -framerate ' + str(fps) + ' -i ' + image_path + ' -t ' + str(duration) + ' -pix_fmt yuv420p ' + output_file_path,
         debug=debug
     )
 
@@ -233,7 +230,7 @@ def concat_videos_reencode(
     
     cmd += ' -filter_complex "'
 
-    for i in range(len(paths)):
+    for i in range(len(in_paths)):
         cmd += '[{}:v] [{}:a] '.format(i, i)
     
     cmd += 'concat=n={}:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" '.format(len(in_paths)) + sh.path(out_path)
