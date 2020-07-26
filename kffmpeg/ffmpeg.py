@@ -175,7 +175,7 @@ def convert_video_to_16_9(
 
     return path.exists(out_path)
 
-def concat_videos_copy(
+def concat_videos(
     in_paths: List[str],
     out_path: str,
     reencode: bool = False,
