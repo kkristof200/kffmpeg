@@ -225,8 +225,8 @@ def concat_videos_reencode(
 
     cmd = 'ffmpeg -y'
 
-    for path in in_paths:
-        cmd += ' -i ' + sh.path(path)
+    for path_ in in_paths:
+        cmd += ' -i ' + sh.path(path_)
     
     cmd += ' -filter_complex "'
 
