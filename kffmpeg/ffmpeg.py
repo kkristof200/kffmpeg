@@ -5,6 +5,45 @@ from kcu import sh, kpath
 
 from . import ffprobe
 
+def reduce_audio_volume(
+    path_in: str,
+    path_out: str,
+    volume: str = '0.25',
+    debug: bool = False
+) -> bool:
+    sh.sh(
+        'ffmpeg -y -i {} -filter:a "volume={}" {}'.format(path_in, volume, path_out),
+        debug=debug
+    )
+
+    return path.exists(path_out)
+
+def get_audio_from_video(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh(
+        'ffmpeg -y -i {} -vn -acodec copy {}'.format(path_in, path_out),
+        debug=debug
+    )
+
+    return path.exists(path_out)
+
+def mix_audios(
+    audio_path_1: str,
+    audio_path_2: str,
+    path_out: str,
+    duration: str = 'longest',
+    debug: bool = False
+) -> bool:
+    sh.sh(
+        'ffmpeg -y -i {} -i {} -filter_complex amix=inputs=2:duration={} {}'.format(audio_path_1, audio_path_2, duration, path_out),
+        debug=debug
+    )
+
+    return path.exists(path_out)
+
 def reencode_mp3(
     path_in: str,
     path_out: str,
