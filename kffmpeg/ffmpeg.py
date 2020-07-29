@@ -21,9 +21,31 @@ def reencode_aac(
     path_out: str,
     debug: bool = False
 ) -> bool:
-    sh.sh(
-        'ffmpeg -y -i ' + path_in + ' -codec:a aac ' + path_out, debug=debug
-    )
+    sh.sh('ffmpeg -y -i {} -codec:a aac {}'.format(path_in, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def modify_audio(
+    path_in: str,
+    path_out: str,
+    channels: Optional[int] = None,     # 2
+    audio_rate: Optional[int] = None,   # 44100
+    bit_rate: Optional[int] = None,     # 133
+    debug: bool = False
+) -> bool:
+    cmd = 'ffmpeg -y -i {}'.format(path_in)
+
+    if channels:
+        cmd += ' -ac {}'.format(channels)
+
+    if audio_rate:
+        cmd += ' -ar {}'.format(audio_rate)
+
+    if bit_rate:
+        cmd += ' -ab {}'.format(bit_rate)
+
+    cmd += ' {}'.format(path_out)
+    sh.sh(cmd, debug=debug)
 
     return path.exists(path_out)
 
