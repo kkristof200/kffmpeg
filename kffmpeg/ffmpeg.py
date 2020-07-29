@@ -16,6 +16,17 @@ def reencode_mp3(
 
     return path.exists(path_out)
 
+def reencode_aac(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh(
+        'ffmpeg -y -i ' + path_in + ' -codec:a aac ' + path_out, debug=debug
+    )
+
+    return path.exists(path_out)
+
 def create_video_from_images(
     input_folder: str,
     output_file_path: str,
