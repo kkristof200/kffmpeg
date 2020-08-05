@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from os import path
 
 from kcu import sh, kpath
@@ -8,7 +8,7 @@ from . import ffprobe
 def reduce_audio_volume(
     path_in: str,
     path_out: str,
-    volume: str = '0.25',
+    volume: Union[int, str] = 0.25,
     debug: bool = False
 ) -> bool:
     sh.sh(
@@ -169,7 +169,7 @@ def add_silence_to_video(
     debug: bool = False
 ) -> bool:
     sh.sh(
-        'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate={} -i {} -c:v copy -c:a aac -{} {}'.format(str(sample_rate), sh.path(input), duration, sh.path(output)), debug=debug
+        'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate={} -i {} -c:v copy -c:a aac -{} {}'.format(sample_rate, sh.path(input), duration, sh.path(output)), debug=debug
     )
 
     return path.exists(output)
