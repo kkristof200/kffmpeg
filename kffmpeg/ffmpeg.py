@@ -164,10 +164,12 @@ def remove_audio(
 def add_silence_to_video(
     input: str,
     output: str,
+    sample_rate: int = 48000,
+    duration: str = 'shortest',
     debug: bool = False
 ) -> bool:
     sh.sh(
-        'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate=48000 -i ' + sh.path(input) + ' -c:v copy -c:a aac -shortest ' + sh.path(output), debug=debug
+        'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate={} -i {} -c:v copy -c:a aac -{} {}'.format(str(sample_rate), sh.path(input), duration, sh.path(output)), debug=debug
     )
 
     return path.exists(output)
@@ -176,6 +178,7 @@ def add_audio_to_video(
     input_a: str,
     input_v: str,
     output: str,
+    duration: str = 'shortest',
     reencode: bool = False,
     debug: bool = False
 ) -> bool:
@@ -184,7 +187,7 @@ def add_audio_to_video(
     if not reencode:
         cmd += ' -c:v copy -map 0:v:0 -map 1:a:0'
     
-    cmd += ' -shortest ' + sh.path(output)
+    cmd += ' -' + duration + ' ' + sh.path(output)
 
     sh.sh(cmd, debug=debug)
 
