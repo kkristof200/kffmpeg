@@ -168,9 +168,13 @@ def add_silence_to_video(
     duration: str = 'shortest',
     debug: bool = False
 ) -> bool:
-    sh.sh(
-        'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate={} -i {} -c:v copy -c:a aac -{} {}'.format(sample_rate, sh.path(input), duration, sh.path(output)), debug=debug
-    )
+    cmd = 'ffmpeg -f lavfi -y -i anullsrc=channel_layout=stereo:sample_rate={} -i {} -c:v copy -c:a aac '.format(sample_rate, sh.path(input))
+
+    if duration == 'shortest':
+        cmd += '-shortest '
+
+    cmd += sh.path(output)
+    sh.sh(cmd, debug=debug)
 
     return path.exists(output)
 
@@ -186,8 +190,11 @@ def add_audio_to_video(
 
     if not reencode:
         cmd += ' -c:v copy -map 0:v:0 -map 1:a:0'
-    
-    cmd += ' -' + duration + ' ' + sh.path(output)
+
+    if duration == 'shortest':
+        cmd += ' -shortest'
+
+    cmd += ' ' + sh.path(output)
 
     sh.sh(cmd, debug=debug)
 
