@@ -81,7 +81,7 @@ def modify_audio(
         cmd += ' -ar {}'.format(audio_rate)
 
     if bit_rate:
-        cmd += ' -ab {}'.format(bit_rate)
+        cmd += ' -ab {}k'.format(bit_rate)
 
     cmd += ' {}'.format(path_out)
     sh.sh(cmd, debug=debug)
