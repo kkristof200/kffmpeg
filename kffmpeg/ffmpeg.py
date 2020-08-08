@@ -223,8 +223,34 @@ def loop(
     out_path: str,
     length_seconds: float,
     debug: bool = False
-):
+) -> bool:
     sh.sh('ffmpeg -y -stream_loop -1 -i ' + sh.path(in_path) + ' -t ' + str(length_seconds) + ' ' + sh.path(out_path), debug=debug)
+
+    return path.exists(out_path)
+
+def trim(
+    in_path: str,
+    out_path: str,
+    start_seconds: float = 0,
+    stop_seconds: Optional[float] = None,
+    duration: Optional[float] = None,
+    debug: bool = False
+) -> bool:
+    """PASS EITHER 'stop_seconds' OR 'duration'
+    IF BOTH PASSED, 'duration' will be taken as preference
+    """
+    if stop_seconds is None and duration is None:
+        print('Either, \'stop_seconds\' should e passed or \'duration\'')
+
+        return False
+
+    if duration is None:
+        duration = stop_seconds - start_seconds
+
+    sh.sh(
+        'ffmpeg -y -ss {} -i {} -t {} -c copy {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), out_path),
+        debug=debug
+    )
 
     return path.exists(out_path)
 
@@ -351,3 +377,15 @@ def __loop_together(
         in_audio_path = in_reference_path
 
     return add_audio_to_video(in_audio_path, in_video_path, out, reencode=reencode, debug=debug)
+
+def __seconds_to_time_str(
+    seconds: float
+) -> str:
+    h = int(seconds/3600)
+    m = int((seconds - h*3600)/60)
+    s = int(seconds - h*3600 - m*60)
+    ms = seconds - int(seconds)
+
+    ms_str = ("%.8f" % (ms)).strip('0') if ms > 0 else ''
+
+    return "%02d:%02d:%02d" % (h, m, s) + ms_str
