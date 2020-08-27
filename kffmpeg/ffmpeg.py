@@ -34,13 +34,16 @@ def mix_audios(
     audio_path_1: str,
     audio_path_2: str,
     path_out: str,
-    duration: str = 'longest',
+    duration: Optional[str] = 'longest',
     debug: bool = False
 ) -> bool:
-    sh.sh(
-        'ffmpeg -y -i {} -i {} -filter_complex amix=inputs=2:duration={} {}'.format(audio_path_1, audio_path_2, duration, path_out),
-        debug=debug
-    )
+    cmd = 'ffmpeg -y -i {} -i {} -filter_complex amix=inputs=2:adelay=0:dropout_transition=0'.format(audio_path_1, audio_path_2)
+
+    if duration:
+        cmd += ':duration={}'.format(duration)
+
+    cmd += ' ' + path_out
+    sh.sh(cmd, debug=debug)
 
     return path.exists(path_out)
 
@@ -61,6 +64,15 @@ def reencode_aac(
     debug: bool = False
 ) -> bool:
     sh.sh('ffmpeg -y -i {} -codec:a aac {}'.format(path_in, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def reencode(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh('ffmpeg -y -i {} {}'.format(path_in, path_out), debug=debug)
 
     return path.exists(path_out)
 
