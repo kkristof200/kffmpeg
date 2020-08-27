@@ -37,7 +37,7 @@ def mix_audios(
     duration: Optional[str] = 'longest',
     debug: bool = False
 ) -> bool:
-    cmd = 'ffmpeg -y -i {} -i {} -filter_complex amix=inputs=2:adelay=0:dropout_transition=0'.format(audio_path_1, audio_path_2)
+    cmd = 'ffmpeg -y -i {} -i {} -filter_complex amix=inputs=2'.format(audio_path_1, audio_path_2)
 
     if duration:
         cmd += ':duration={}'.format(duration)
