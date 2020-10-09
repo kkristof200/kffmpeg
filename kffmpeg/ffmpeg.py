@@ -47,6 +47,27 @@ def mix_audios(
 
     return path.exists(path_out)
 
+def mix_multiple_audios(
+    audio_paths: List[str],
+    path_out: str,
+    duration: Optional[str] = 'longest',
+    debug: bool = False
+) -> bool:
+    cmd = 'ffmpeg -y'
+
+    for audio_path in audio_paths:
+        cmd += ' -i ' + sh.path(audio_path)
+
+    cmd += ' -filter_complex amix=inputs=' + str(len(audio_paths))
+
+    if duration:
+        cmd += ':duration={}'.format(duration)
+
+    cmd += ' ' + path_out
+    sh.sh(cmd, debug=debug)
+
+    return path.exists(path_out)
+
 def reencode_mp3(
     path_in: str,
     path_out: str,
