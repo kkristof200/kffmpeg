@@ -352,6 +352,10 @@ def concat_videos_copy(
 
     return path.exists(out_path)
 
+#aliases
+concat_copy = concat_videos_copy
+concat_audios_copy = concat_videos_copy
+
 def concat_videos_reencode(
     in_paths: List[str],
     out_path: str,
