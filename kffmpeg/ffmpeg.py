@@ -183,6 +183,8 @@ def create_video_from_image(
         debug=debug
     )
 
+    return path.exists(output_file_path)
+
 def remove_audio(
     input: str,
     output: str,
