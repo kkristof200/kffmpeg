@@ -91,9 +91,27 @@ def reencode_aac(
 def reencode(
     path_in: str,
     path_out: str,
+    fps: Optional[Union[float, str]] = None,
+    sar: Optional[str] = None,
     debug: bool = False
 ) -> bool:
-    sh.sh('ffmpeg -y -i {} {}'.format(path_in, path_out), debug=debug)
+    cmd = 'ffmpeg -y -i {}'.format(path_in)
+
+    if fps or sar:
+        cmd_filter = ''
+
+        if fps:
+            cmd_filter += 'fps=fps={}'.format(fps)
+
+        if sar:
+            if len(cmd_filter) > 0:
+                cmd_filter += ','
+
+            cmd_filter += 'setsar={}'.format(sar)
+
+        cmd += ' -filter:v ' + cmd_filter
+
+    sh.sh('{} {}'.format(cmd, path_out), debug=debug)
 
     return path.exists(path_out)
 
@@ -338,16 +356,9 @@ def concat_videos_copy(
         return True
 
     temp_txt_path = path.join(kpath.folder_path_of_file(out_path), '__temp_list.txt')
-    temp_txt_content = ''
-
-    for in_path in in_paths:
-        if len(temp_txt_content) > 0:
-            temp_txt_content += '\n'
-
-        temp_txt_content += 'file \'' + in_path + '\''
 
     with open(temp_txt_path, 'w') as f:
-        f.write(temp_txt_content)
+        f.write('\n'.join(['file \'' + p + '\'' for p in in_paths]))
 
     sh.sh('ffmpeg -y -f concat -safe 0 -i ' + sh.path(temp_txt_path) + ' -c copy ' + sh.path(out_path), debug=debug)
     kpath.remove(temp_txt_path)
