@@ -301,7 +301,7 @@ def trim(
         duration = stop_seconds - start_seconds
 
     sh.sh(
-        'ffmpeg -y -ss {} -i {} -t {} -c copy {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), out_path),
+        'ffmpeg -y -ss {} -i {} -t {} -c copy -avoid_negative_ts make_zero {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), out_path),
         debug=debug
     )
 
