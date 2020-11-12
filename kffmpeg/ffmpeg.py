@@ -287,6 +287,7 @@ def trim(
     start_seconds: float = 0,
     stop_seconds: Optional[float] = None,
     duration: Optional[float] = None,
+    reencode: bool = False,
     debug: bool = False
 ) -> bool:
     """PASS EITHER 'stop_seconds' OR 'duration'
@@ -301,7 +302,7 @@ def trim(
         duration = stop_seconds - start_seconds
 
     sh.sh(
-        'ffmpeg -y -ss {} -i {} -t {} -c copy -avoid_negative_ts make_zero {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), out_path),
+        'ffmpeg -y -ss {} -i {} -t {} {} {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), '-c copy -avoid_negative_ts make_zero' if reencode else '-async 1', out_path),
         debug=debug
     )
 
