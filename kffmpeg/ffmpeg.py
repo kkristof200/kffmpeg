@@ -91,27 +91,24 @@ def reencode_aac(
 def reencode(
     path_in: str,
     path_out: str,
-    fps: Optional[Union[int, float, str]] = None,
-    sar: Optional[str] = None,
+    fps: Optional[float] = None,
     debug: bool = False
 ) -> bool:
-    cmd = 'ffmpeg -y -i {}'.format(path_in)
+    cmd = 'ffmpeg -y -i {} -filter:v'.format(path_in)
 
-    if fps or sar:
-        cmd_filter = ''
-
-        if fps:
-            cmd_filter += 'fps=fps={}'.format(fps)
-
-        if sar:
-            if len(cmd_filter) > 0:
-                cmd_filter += ','
-
-            cmd_filter += 'setsar={}'.format(sar)
-
-        cmd += ' -filter:v ' + cmd_filter
+    if fps:
+        cmd += ' fps=fps={}'.format(fps)
 
     sh.sh('{} {}'.format(cmd, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def ts_to_mp4(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh('ffmpeg -y -i {} -acodec copy -vcodec copy {}'.format(path_in, path_out), debug=debug)
 
     return path.exists(path_out)
 
