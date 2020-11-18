@@ -92,12 +92,23 @@ def reencode(
     path_in: str,
     path_out: str,
     fps: Optional[float] = None,
+    sar: Optional[str] = None,
     debug: bool = False
 ) -> bool:
-    cmd = 'ffmpeg -y -i {} -filter:v'.format(path_in)
+    cmd = 'ffmpeg -y -i {}'.format(path_in)
 
-    if fps:
-        cmd += ' fps=fps={}'.format(fps)
+    if fps or sar:
+        cmd_filter = ''
+
+        if fps:
+            cmd_filter += 'fps=fps={}'.format(fps)
+        if sar:
+            if len(cmd_filter) > 0:
+                cmd_filter += ','
+
+            cmd_filter += 'setsar={}'.format(sar) 
+
+        cmd += ' -filter:v ' + cmd_filter
 
     sh.sh('{} {}'.format(cmd, path_out), debug=debug)
 
