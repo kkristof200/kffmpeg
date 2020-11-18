@@ -91,7 +91,7 @@ def reencode_aac(
 def reencode(
     path_in: str,
     path_out: str,
-    fps: Optional[float] = None,
+    fps: Optional[Union[int, float, str]] = None,
     sar: Optional[str] = None,
     debug: bool = False
 ) -> bool:
