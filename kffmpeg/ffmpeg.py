@@ -123,6 +123,57 @@ def ts_to_mp4(
 
     return path.exists(path_out)
 
+def flip_video_horizontal(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh('ffmpeg -y -i {} -vf hflip -c:a copy {}'.format(path_in, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def flip_video_vertical(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh('ffmpeg -y -i {} -vf vflip -c:a copy {}'.format(path_in, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def flip_video_horizontal(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh('ffmpeg -y -i {} -vf hflip -c:a copy {}'.format(path_in, path_out), debug=debug)
+
+    return path.exists(path_out)
+
+def rotate_video(
+    path_in: str,
+    path_out: str,
+    times_90_degrees: int,
+    debug: bool = False
+) -> bool:
+    times_90_degrees = times_90_degrees % 4
+
+    rot_val = 1 if times_90_degrees > 0 else 2
+
+    if times_90_degrees == 0:
+        sh.cp(path_in, path_out)
+    else:
+        sh.sh(
+            'ffmpeg -y -i {} -vf "{}" {}'.format(
+                sh.path(path_in),
+                ','.join(['transpose={}'.format(rot_val) for _ in range(times_90_degrees)]),
+                sh.path(path_out)
+            ),
+            debug=debug
+        )
+
+    return path.exists(path_out)
+
 def modify_audio(
     path_in: str,
     path_out: str,
