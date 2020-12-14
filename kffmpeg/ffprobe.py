@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from kcu import sh, kpath
 
@@ -11,6 +11,18 @@ def get_duration(video_path: str) -> float:
         return float(res.strip())
     except:
         return 0
+
+def get_size(video_path: str) -> Optional[Tuple[int, int]]:
+    res = sh.sh(
+        'ffprobe -v error -show_entries stream=width,height -of default=noprint_wrappers=1 {}'.format(video_path)
+    ).strip()
+
+    try:
+        comps = [c.split('=')[1] for c in res.split('\n')]
+
+        return (int(comps[0]), int(comps[1]))
+    except Exception as e:
+        return None
 
 def get_folder_video_duration(folder_path: str, allowed_extensions: List[str] = ['mp4']) -> float:
     total = 0

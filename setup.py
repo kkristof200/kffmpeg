@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="kffmpeg",
-    version="0.2.37",
+    version="0.2.38",
     author="Kovacs Kristof-Attila",
     description="kffmpeg",
     long_description=long_description,
