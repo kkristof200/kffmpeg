@@ -62,6 +62,23 @@ def video_resolution(
 
     return None, None
 
+def get_video_fps(
+    path: str
+) -> Optional[float]:
+    res = sh.sh(
+        'ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate ' + sh.path(path)
+    ).strip()
+
+    try:
+        fps = res.split('/')
+
+        if len(fps) == 2:
+            return float(fps[0]) / float(fps[1])
+    except:
+        pass
+
+    return None
+
 def __audio_data(path: str) -> str:
     return sh.sh(
         'ffprobe -i ' + sh.path(path) + ' -show_streams 2>&1 | grep \'Stream #0:1\''

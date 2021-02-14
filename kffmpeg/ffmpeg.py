@@ -93,21 +93,31 @@ def reencode(
     path_out: str,
     fps: Optional[Union[int, float, str]] = None,
     sar: Optional[str] = None,
+    resolution: Optional[str] = None,
     debug: bool = False
 ) -> bool:
+    ''' resolution and sar should be given in the following format: "x:y" 
+        fps should be lower than the original value so frames don't freeze 
+    '''
+
     cmd = 'ffmpeg -y -i {}'.format(path_in)
 
     if fps or sar:
         cmd_filter = ''
 
         if fps:
-            cmd_filter += 'fps=fps={}'.format(fps)
+            cmd_filter += 'fps={}'.format(fps)
+        if resolution:
+            if len(cmd_filter) > 0:
+                cmd_filter += ','
+
+            cmd_filter += 'scale={}'.format(resolution)
         if sar:
             if len(cmd_filter) > 0:
                 cmd_filter += ','
 
-            cmd_filter += 'setsar={}'.format(sar) 
-
+            cmd_filter += 'setsar={}'.format(sar)
+        
         cmd += ' -filter:v ' + cmd_filter
 
     sh.sh('{} {}'.format(cmd, path_out), debug=debug)
@@ -138,15 +148,6 @@ def flip_video_vertical(
     debug: bool = False
 ) -> bool:
     sh.sh('ffmpeg -y -i {} -vf vflip -c:a copy {}'.format(path_in, path_out), debug=debug)
-
-    return path.exists(path_out)
-
-def flip_video_horizontal(
-    path_in: str,
-    path_out: str,
-    debug: bool = False
-) -> bool:
-    sh.sh('ffmpeg -y -i {} -vf hflip -c:a copy {}'.format(path_in, path_out), debug=debug)
 
     return path.exists(path_out)
 
