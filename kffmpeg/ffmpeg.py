@@ -96,8 +96,8 @@ def reencode(
     resolution: Optional[str] = None,
     debug: bool = False
 ) -> bool:
-    ''' resolution and sar should be given in the following format: "x:y" 
-        fps should be lower than the original value so frames don't freeze 
+    ''' resolution and sar should be given in the following format: "x:y"
+        fps should be lower than the original value so frames don't freeze
     '''
 
     cmd = 'ffmpeg -y -i {}'.format(path_in)
@@ -117,7 +117,7 @@ def reencode(
                 cmd_filter += ','
 
             cmd_filter += 'setsar={}'.format(sar)
-        
+
         cmd += ' -filter:v ' + cmd_filter
 
     sh.sh('{} {}'.format(cmd, path_out), debug=debug)
@@ -377,12 +377,12 @@ def convert_video_to_16_9(
 
     if h is None or w is None:
         return False
-    
+
     if h == 1080 and w == 1920:
         sh.cp(in_path, out_path)
 
         return True
-    
+
     if w/h < 16/9:
         sh.sh(
             'ffmpeg -y -i ' + sh.path(in_path) + " -vf 'split[original][copy];[copy]scale=1920:-1,setsar=1:1,crop=h=1080,gblur=sigma=75[blurred];[original]scale=-1:1080[original_resized];[blurred][original_resized]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2' " + sh.path(out_path), debug=debug
@@ -446,12 +446,12 @@ def concat_videos_reencode(
 
     for path_ in in_paths:
         cmd += ' -i ' + sh.path(path_)
-    
+
     cmd += ' -filter_complex "'
 
     for i in range(len(in_paths)):
         cmd += '[{}:v] [{}:a] '.format(i, i)
-    
+
     cmd += 'concat=n={}:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" '.format(len(in_paths)) + sh.path(out_path)
 
     sh.sh(cmd, debug=debug)

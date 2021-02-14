@@ -5,14 +5,16 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="kffmpeg",
-    version="0.2.38",
+    version="0.2.39",
     author="Kovacs Kristof-Attila",
     description="kffmpeg",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kkristof200/kffmpeg",
     packages=setuptools.find_packages(),
-    install_requires=["kcu"],
+    install_requires=[
+        'kcu>=0.0.60'
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

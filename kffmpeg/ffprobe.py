@@ -29,7 +29,7 @@ def get_folder_video_duration(folder_path: str, allowed_extensions: List[str] = 
 
     for video_path in kpath.file_paths_from_folder(folder_path, allowed_extensions=allowed_extensions):
         total += get_duration(video_path)
-    
+
     return total
 
 def has_only_silence(path: str) -> bool:
