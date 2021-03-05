@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="kffmpeg",
-    version="0.2.39",
+    version="0.2.40",
     author="Kovacs Kristof-Attila",
     description="kffmpeg",
     long_description=long_description,
@@ -13,7 +13,7 @@ setuptools.setup(
     url="https://github.com/kkristof200/kffmpeg",
     packages=setuptools.find_packages(),
     install_requires=[
-        'kcu>=0.0.60'
+        'kcu>=0.0.65'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

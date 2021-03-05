@@ -21,7 +21,7 @@ def get_size(video_path: str) -> Optional[Tuple[int, int]]:
         comps = [c.split('=')[1] for c in res.split('\n')]
 
         return (int(comps[0]), int(comps[1]))
-    except Exception as e:
+    except:
         return None
 
 def get_folder_video_duration(folder_path: str, allowed_extensions: List[str] = ['mp4']) -> float:

@@ -458,6 +458,23 @@ def concat_videos_reencode(
 
     return path.exists(out_path)
 
+def get_frame(
+    at_second: float,
+    p_video_in: str,
+    p_img_out: str,
+    debug: bool = False
+) -> bool:
+    res = sh.sh(
+        'ffmpeg -ss {} -i {} -frames:v 1 {}'.format(at_second, p_video_in, p_img_out),
+        debug=debug
+    )
+
+    if debug:
+        print(res)
+
+    return path.exists(p_img_out)
+
+
 # Private
 
 # both in_reference_path and in_follower_path can be audio or video
