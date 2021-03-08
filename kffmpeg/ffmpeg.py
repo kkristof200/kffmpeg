@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from os import path
+import random
 
 from kcu import sh, kpath
 
@@ -424,6 +425,44 @@ def concat_videos_copy(
     sh.sh('ffmpeg -y -f concat -safe 0 -i ' + sh.path(temp_txt_path) + ' -c copy ' + sh.path(out_path), debug=debug)
     kpath.remove(temp_txt_path)
 
+    return path.exists(out_path)
+
+def concat_videos_loop(
+    in_paths: List[str],
+    out_path: str,
+    video_duration: float,
+    randomize_videos: Optional[bool] = False,
+    debug: bool = False
+) -> bool:
+    if len(in_paths) == 0:
+        return False
+    elif len(in_paths) == 1:
+        sh.cp(in_paths[0], out_path)
+
+        return True
+    
+    temp_txt_path = path.join(kpath.folder_path_of_file(out_path), '__temp_video_paths.txt')
+    current_video_duration = 0
+    final_text = ''
+    
+    while current_video_duration < video_duration:
+        if randomize_videos:
+            random.shuffle(in_paths)
+        
+        for vid_path in in_paths:
+            final_text += 'file ' + '\'' + vid_path + '\'\n'
+            subvid_duration = ffprobe.get_duration(vid_path)
+            current_video_duration += subvid_duration
+
+            if current_video_duration >= video_duration:
+                with open(temp_txt_path, 'w') as f:
+                    f.write(final_text)
+
+                break
+    
+    sh.sh('ffmpeg -y -f concat -safe 0 -i ' + sh.path(temp_txt_path) + ' -c copy ' + sh.path(out_path), debug=debug)
+    kpath.remove(temp_txt_path)
+    
     return path.exists(out_path)
 
 #aliases
