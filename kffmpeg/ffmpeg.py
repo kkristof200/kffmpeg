@@ -363,7 +363,7 @@ def trim(
         duration = stop_seconds - start_seconds
 
     sh.sh(
-        'ffmpeg -y -ss {} -i {} -t {} {} {}'.format(__seconds_to_time_str(start_seconds), sh.path(in_path), __seconds_to_time_str(duration), '-c copy -avoid_negative_ts make_zero' if reencode else '-async 1', out_path),
+        'ffmpeg -y -ss {} -i \'{}\' -t {} {} {}'.format(__seconds_to_time_str(start_seconds), in_path, __seconds_to_time_str(duration), '-c copy -avoid_negative_ts make_zero' if reencode else '-async 1', out_path),
         debug=debug
     )
 
