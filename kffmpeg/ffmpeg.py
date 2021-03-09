@@ -440,15 +440,15 @@ def concat_videos_loop(
         sh.cp(in_paths[0], out_path)
 
         return True
-    
+
     temp_txt_path = path.join(kpath.folder_path_of_file(out_path), '__temp_video_paths.txt')
     current_video_duration = 0
     final_text = ''
-    
+
     while current_video_duration < video_duration:
         if randomize_videos:
             random.shuffle(in_paths)
-        
+
         for vid_path in in_paths:
             final_text += 'file ' + '\'' + vid_path + '\'\n'
             subvid_duration = ffprobe.get_duration(vid_path)
@@ -459,10 +459,10 @@ def concat_videos_loop(
                     f.write(final_text)
 
                 break
-    
+
     sh.sh('ffmpeg -y -f concat -safe 0 -i ' + sh.path(temp_txt_path) + ' -c copy ' + sh.path(out_path), debug=debug)
     kpath.remove(temp_txt_path)
-    
+
     return path.exists(out_path)
 
 #aliases
