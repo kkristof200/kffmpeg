@@ -89,6 +89,16 @@ def reencode_aac(
 
     return path.exists(path_out)
 
+# for ex wav to m4a
+def simple_reencode(
+    path_in: str,
+    path_out: str,
+    debug: bool = False
+) -> bool:
+    sh.sh(f'ffmpeg -y -i {path_in} {path_out}', debug=debug)
+
+    return path.exists(path_out)
+
 def reencode(
     path_in: str,
     path_out: str,
