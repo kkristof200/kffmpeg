@@ -1,2 +1,2 @@
 kcu==0.0.73
-setuptools==62.2.0
+setuptools==65.5.1
